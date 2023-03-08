@@ -1,0 +1,26 @@
+service: example-api-lambda-node
+frameworkVersion: "3"
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+
+functions:
+  ApiExample1:
+    handler: apps/example/index.handler
+    events:
+      - httpApi:
+          method: "*"
+          cors: true
+          path: /api1/{proxy+}
+
+  ApiExample2:
+    handler: apps/example2/index.handler
+    events:
+      - httpApi:
+          method: "*"
+          cors: true
+          path: /api2/{proxy+}
