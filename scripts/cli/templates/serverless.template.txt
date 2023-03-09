@@ -1,0 +1,10 @@
+service: {{name}}
+frameworkVersion: "{{frameworkVersion}}"
+plugins:
+  - serverless-offline
+
+provider:
+  name: {{provider}}
+  runtime: {{runtime}}
+  region: {{region}}
+
