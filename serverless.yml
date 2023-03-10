@@ -9,18 +9,21 @@ provider:
   region: us-east-2
 
 functions:
-  ApiExample1:
-    handler: apps/example/index.handler
-    events:
-      - httpApi:
-          method: "*"
-          cors: true
-          path: /api1/{proxy+}
 
-  ApiExample2:
-    handler: apps/example2/index.handler
+
+  vendas:
+    handler: src/apps/vendas/index.handler
     events:
       - httpApi:
           method: "*"
           cors: true
-          path: /api2/{proxy+}
+          path: /vendas/{proxy+}
+    
+  estoque:
+    handler: src/apps/estoque/index.handler
+    events:
+      - httpApi:
+          method: "*"
+          cors: true
+          path: /estoque/{proxy+}
+    

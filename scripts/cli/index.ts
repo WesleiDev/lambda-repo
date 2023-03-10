@@ -4,7 +4,14 @@ import { FolderAlreadyCreatedException } from '../../src/utils/dir/exceptions';
 import { createFolder } from '../../src/utils/dir';
 import { renderTemplate } from '../../src/utils/cli';
 import * as path from 'path';
-import { TEMPLATE_API, TEMPLATE_CONFIG_APP } from './etc/const';
+import * as fsSync from 'fs/promises';
+import * as fs from 'fs';
+import {
+  TEMPLATE_API,
+  TEMPLATE_CONFIG_APP,
+  TEMPLATE_SERVERLESS,
+} from './etc/const';
+import { ConfigApp, ServerlessConfig } from './etc/types';
 
 function getArgs() {
   const ARGS = process.argv.slice(2).shift();
@@ -56,10 +63,70 @@ async function createTemplateApi(appName: string, dirApp: string) {
 
   await renderTemplate(
     `${pathRoot}/${TEMPLATE_CONFIG_APP}`,
-    { name: appName, type: 'api', handle: 'index.handle' },
+    { name: appName, type: 'api', handler: 'index.handler' },
     dirApp,
     'application.json',
   );
+
+  await addConfigAppOnServerless(dirApp);
+}
+
+async function mountConfigServerlessApp(pathApp: string) {
+  let dataConfigApp = await fsSync.readFile(
+    `${pathApp}/application.json`,
+    'utf8',
+  );
+
+  if (!dataConfigApp) {
+    throw new Error(`Config app not found: ${pathApp}`);
+  }
+
+  const appConfig = JSON.parse(dataConfigApp) as ConfigApp;
+
+  const content = `
+  ${appConfig.name}:
+    handler: src/apps/${appConfig.name}/${appConfig.handler}
+    events:
+      - httpApi:
+          method: "*"
+          cors: true
+          path: /${appConfig.name}/{proxy+}
+    `;
+
+  return content;
+}
+
+async function createBaseServerlessConfigBase() {
+  const rootPath = getRootPath();
+
+  const { CONFIG_SERVERLESS: serverlessConfig } =
+    require(`${rootPath}/config/serverless.config`) as {
+      CONFIG_SERVERLESS: ServerlessConfig;
+    };
+
+  await renderTemplate(
+    `${rootPath}/${TEMPLATE_SERVERLESS}`,
+    {
+      name: serverlessConfig.name,
+      frameworkVersion: serverlessConfig.frameworkVersion,
+      provider: serverlessConfig.provider,
+      runtime: serverlessConfig.runtime,
+      region: serverlessConfig.region,
+    },
+    rootPath,
+    'serverless.yml',
+  );
+}
+
+async function addConfigAppOnServerless(pathApp: string) {
+  const content = await mountConfigServerlessApp(pathApp);
+  const rootPath = getRootPath();
+
+  if (!fs.existsSync(`${rootPath}/serverless.yml`)) {
+    await createBaseServerlessConfigBase();
+  }
+
+  await fsSync.appendFile(`${rootPath}/serverless.yml`, content);
 }
 
 async function main() {

@@ -8,3 +8,5 @@ provider:
   runtime: {{runtime}}
   region: {{region}}
 
+functions:
+
