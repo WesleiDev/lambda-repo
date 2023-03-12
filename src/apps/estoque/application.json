@@ -1,5 +1,0 @@
-{
-  "name": "estoque",
-  "type": "api",
-  "handler": "index.handler"
-}

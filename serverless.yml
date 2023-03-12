@@ -9,27 +9,3 @@ provider:
   region: us-east-2
 
 functions:
-  vendas:
-    handler: src/apps/vendas/index.handler
-    events:
-      - httpApi:
-          method: '*'
-          cors: true
-          path: /vendas/{proxy+}
-
-  estoque:
-    handler: src/apps/estoque/index.handler
-    events:
-      - httpApi:
-          method: '*'
-          cors: true
-          path: /estoque/{proxy+}
-
-  fiscal:
-    handler: src/apps/fiscal/index.handler
-    events:
-      - httpApi:
-          method: "*"
-          cors: true
-          path: /fiscal/{proxy+}
-    

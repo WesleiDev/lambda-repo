@@ -1,5 +1,0 @@
-{
-  "name": "vendas",
-  "type": "api",
-  "handler": "index.handler"
-}
