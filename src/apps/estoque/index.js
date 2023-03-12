@@ -10,7 +10,7 @@ app.get('/estoque', (req, res, next) => {
 
 app.get('/estoque/path', (req, res, next) => {
   return res.status(200).json({
-    message: 'Hello from path example1!',
+    message: 'Hello from path estoque!',
   });
 });
 
